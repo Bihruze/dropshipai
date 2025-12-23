@@ -70,47 +70,33 @@ const ProductResearch: React.FC = () => {
 
   // Demo products for when API is not connected
   const getDemoProducts = (keyword: string): SupplierProduct[] => {
-    return [
-      {
-        id: `demo-1-${Date.now()}`,
-        title: `${keyword} - Premium Quality`,
-        description: `High quality ${keyword} with fast shipping. Perfect for dropshipping.`,
-        images: [`https://via.placeholder.com/400x400?text=${encodeURIComponent(keyword)}`],
-        costPrice: 12.50,
-        suggestedPrice: 29.99,
-        category: category !== 'All' ? category : 'General',
-        rating: 4.5,
-        sold: 1250,
-        shippingTime: "7-15 days",
-        variants: ["Default"]
-      },
-      {
-        id: `demo-2-${Date.now()}`,
-        title: `${keyword} - Best Seller`,
-        description: `Top rated ${keyword}. Customer favorite with excellent reviews.`,
-        images: [`https://via.placeholder.com/400x400?text=${encodeURIComponent(keyword)}+2`],
-        costPrice: 8.99,
-        suggestedPrice: 24.99,
-        category: category !== 'All' ? category : 'General',
-        rating: 4.8,
-        sold: 3400,
-        shippingTime: "5-12 days",
-        variants: ["Small", "Medium", "Large"]
-      },
-      {
-        id: `demo-3-${Date.now()}`,
-        title: `${keyword} - Budget Option`,
-        description: `Affordable ${keyword} with good quality. Great for testing market.`,
-        images: [`https://via.placeholder.com/400x400?text=${encodeURIComponent(keyword)}+3`],
-        costPrice: 5.50,
-        suggestedPrice: 15.99,
-        category: category !== 'All' ? category : 'General',
-        rating: 4.2,
-        sold: 890,
-        shippingTime: "10-20 days",
-        variants: ["One Size"]
-      },
+    const k = keyword.toLowerCase();
+    const cat = category !== 'All' ? category : 'General';
+    const ts = Date.now();
+
+    // Generate varied products based on search
+    const baseProducts = [
+      { suffix: 'Pro', cost: 15.99, sell: 39.99, rating: 4.7, sold: 2340, ship: "5-10 days", variants: ["Black", "White", "Blue"] },
+      { suffix: 'Premium', cost: 22.50, sell: 54.99, rating: 4.9, sold: 5120, ship: "3-7 days", variants: ["Standard", "Deluxe"] },
+      { suffix: 'Lite', cost: 8.50, sell: 19.99, rating: 4.3, sold: 1890, ship: "7-14 days", variants: ["One Size"] },
+      { suffix: 'Max', cost: 28.00, sell: 69.99, rating: 4.8, sold: 3200, ship: "5-12 days", variants: ["S", "M", "L", "XL"] },
+      { suffix: 'Mini', cost: 6.99, sell: 16.99, rating: 4.4, sold: 4500, ship: "10-18 days", variants: ["Red", "Blue", "Green"] },
+      { suffix: 'Ultra', cost: 35.00, sell: 89.99, rating: 4.6, sold: 980, ship: "3-8 days", variants: ["Basic", "Advanced"] },
     ];
+
+    return baseProducts.map((p, i) => ({
+      id: `demo-${i + 1}-${ts}`,
+      title: `${keyword} ${p.suffix}`,
+      description: `High quality ${keyword} ${p.suffix.toLowerCase()} version. Perfect for dropshipping with excellent profit margins. Fast shipping available.`,
+      images: [`https://picsum.photos/seed/${k}${i}/400/400`],
+      costPrice: p.cost,
+      suggestedPrice: p.sell,
+      category: cat,
+      rating: p.rating,
+      sold: p.sold,
+      shippingTime: p.ship,
+      variants: p.variants
+    }));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -218,14 +204,14 @@ const ProductResearch: React.FC = () => {
         </div>
       </div>
 
-      {/* Error Message */}
+      {/* Info Message */}
       {error && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start gap-3">
-          <div className="w-5 h-5 text-yellow-600 mt-0.5">⚠️</div>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+          <div className="w-5 h-5 text-blue-600 mt-0.5">ℹ️</div>
           <div>
-            <p className="text-yellow-800 font-medium">{error}</p>
-            <p className="text-yellow-600 text-sm mt-1">
-              Settings → API Keys bölümünden CJ API anahtarınızı ekleyin.
+            <p className="text-blue-800 font-medium">Demo Modu</p>
+            <p className="text-blue-600 text-sm mt-1">
+              Şu an demo veriler gösteriliyor. Gerçek CJ ürünleri için backend'in Render'da deploy edilmesi gerekiyor.
             </p>
           </div>
         </div>
