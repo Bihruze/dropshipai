@@ -1,23 +1,23 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { SupplierProduct } from '../types';
+import { Search, Loader2, ShoppingBag, TrendingUp, DollarSign, Package, ExternalLink } from 'lucide-react';
 
 const CATEGORIES = [
   "All", "Electronics", "Home & Garden", "Pet Supplies", "Beauty",
-  "Sports", "Car Accessories", "Baby", "Fashion"
+  "Sports", "Car Accessories", "Baby", "Fashion", "Toys"
 ];
 
-// Products will be loaded from CJ Dropshipping API when connected
-const SUPPLIER_PRODUCTS: SupplierProduct[] = [];
-
 const ProductResearch: React.FC = () => {
-  const { importProduct } = useStore();
+  const { importProduct, settings } = useStore();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [products, setProducts] = useState<SupplierProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<SupplierProduct | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   // Modal State
   const [sellingPrice, setSellingPrice] = useState<string>('');
@@ -28,15 +28,96 @@ const ProductResearch: React.FC = () => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const filteredProducts = useMemo(() => {
-    return SUPPLIER_PRODUCTS.filter(p => {
-      const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory = category === 'All' || p.category === category;
-      const matchesMin = minPrice === '' || p.costPrice >= parseFloat(minPrice);
-      const matchesMax = maxPrice === '' || p.costPrice <= parseFloat(maxPrice);
-      return matchesSearch && matchesCategory && matchesMin && matchesMax;
-    });
-  }, [search, category, minPrice, maxPrice]);
+  const searchProducts = async () => {
+    if (!search.trim()) {
+      setError('Lütfen arama terimi girin');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setHasSearched(true);
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/cj/products/search?keyword=${encodeURIComponent(search)}&category=${category !== 'All' ? category : ''}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        setProducts(data.data);
+        if (data.data.length === 0) {
+          setError('Ürün bulunamadı. Farklı anahtar kelime deneyin.');
+        }
+      } else {
+        // API bağlı değilse demo veri göster
+        setError('CJ API bağlantısı kurulamadı. Demo veriler gösteriliyor.');
+        setProducts(getDemoProducts(search));
+      }
+    } catch (err) {
+      console.error('Search error:', err);
+      // API bağlı değilse demo veri göster
+      setError('Backend bağlantısı yok. Demo veriler gösteriliyor.');
+      setProducts(getDemoProducts(search));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Demo products for when API is not connected
+  const getDemoProducts = (keyword: string): SupplierProduct[] => {
+    return [
+      {
+        id: `demo-1-${Date.now()}`,
+        title: `${keyword} - Premium Quality`,
+        description: `High quality ${keyword} with fast shipping. Perfect for dropshipping.`,
+        images: [`https://via.placeholder.com/400x400?text=${encodeURIComponent(keyword)}`],
+        costPrice: 12.50,
+        suggestedPrice: 29.99,
+        category: category !== 'All' ? category : 'General',
+        rating: 4.5,
+        sold: 1250,
+        shippingTime: "7-15 days",
+        variants: ["Default"]
+      },
+      {
+        id: `demo-2-${Date.now()}`,
+        title: `${keyword} - Best Seller`,
+        description: `Top rated ${keyword}. Customer favorite with excellent reviews.`,
+        images: [`https://via.placeholder.com/400x400?text=${encodeURIComponent(keyword)}+2`],
+        costPrice: 8.99,
+        suggestedPrice: 24.99,
+        category: category !== 'All' ? category : 'General',
+        rating: 4.8,
+        sold: 3400,
+        shippingTime: "5-12 days",
+        variants: ["Small", "Medium", "Large"]
+      },
+      {
+        id: `demo-3-${Date.now()}`,
+        title: `${keyword} - Budget Option`,
+        description: `Affordable ${keyword} with good quality. Great for testing market.`,
+        images: [`https://via.placeholder.com/400x400?text=${encodeURIComponent(keyword)}+3`],
+        costPrice: 5.50,
+        suggestedPrice: 15.99,
+        category: category !== 'All' ? category : 'General',
+        rating: 4.2,
+        sold: 890,
+        shippingTime: "10-20 days",
+        variants: ["One Size"]
+      },
+    ];
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      searchProducts();
+    }
+  };
 
   const handleOpenDetails = (product: SupplierProduct) => {
     setSelectedProduct(product);
@@ -46,183 +127,192 @@ const ProductResearch: React.FC = () => {
   const handleImport = (product: SupplierProduct, price: string) => {
     importProduct(product, parseFloat(price));
     setSelectedProduct(null);
-    showToast(`"${product.title}" imported to My Products!`);
+    showToast(`"${product.title}" ürünler listesine eklendi!`);
   };
 
   const calculateProfit = (cost: number, sell: number, ship: number) => {
-    const fees = sell * 0.03; // 3% platform fee
+    const fees = sell * 0.03;
     const profit = sell - cost - ship - fees;
     const margin = (profit / sell) * 100;
     return { profit, margin, fees };
   };
 
-  const profitStats = useMemo(() => {
-    if (!selectedProduct) return null;
-    return calculateProfit(
-      selectedProduct.costPrice,
-      parseFloat(sellingPrice) || 0,
-      parseFloat(shippingCost) || 0
-    );
-  }, [selectedProduct, sellingPrice, shippingCost]);
+  const profitStats = selectedProduct ? calculateProfit(
+    selectedProduct.costPrice,
+    parseFloat(sellingPrice) || 0,
+    parseFloat(shippingCost) || 0
+  ) : null;
 
   return (
     <div className="p-6 space-y-6">
-      {/* Toast Notification */}
+      {/* Toast */}
       {toast && (
         <div className="fixed top-20 right-6 z-50 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg font-medium">
           {toast}
         </div>
       )}
 
+      {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Product Research</h2>
-        <p className="text-gray-500 mt-1">Discover and source winning products directly from global suppliers.</p>
+        <h2 className="text-2xl font-bold text-gray-900">Ürün Araştırma</h2>
+        <p className="text-gray-500 mt-1">CJ Dropshipping'den ürün arayın ve mağazanıza ekleyin</p>
       </div>
 
-      {/* Filter Section */}
-      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2 relative">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      {/* Search Section */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900"
+              onKeyPress={handleKeyPress}
+              placeholder="Ürün ara... (örn: wireless earbuds, phone case, yoga mat)"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
+            className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[180px]"
           >
-            {CATEGORIES.map(cat => <option key={cat}>{cat}</option>)}
+            {CATEGORIES.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
           </select>
-          <div className="flex gap-2">
-            <input
-              type="number"
-              placeholder="Min $"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              className="w-1/2 bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
-            />
-            <input
-              type="number"
-              placeholder="Max $"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-1/2 bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
-            />
-          </div>
+          <button
+            onClick={searchProducts}
+            disabled={loading}
+            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Aranıyor...
+              </>
+            ) : (
+              <>
+                <Search className="w-5 h-5" />
+                Ara
+              </>
+            )}
+          </button>
         </div>
-        <button
-          onClick={() => { setSearch(''); setCategory('All'); setMinPrice(''); setMaxPrice(''); }}
-          className="text-gray-500 font-medium text-sm hover:text-indigo-600"
-        >
-          Clear Filters
-        </button>
+
+        {/* Quick Search Tags */}
+        <div className="flex flex-wrap gap-2">
+          <span className="text-sm text-gray-500">Popüler:</span>
+          {['Wireless Earbuds', 'Phone Case', 'LED Lights', 'Pet Toys', 'Yoga Mat'].map(tag => (
+            <button
+              key={tag}
+              onClick={() => {
+                setSearch(tag);
+                setTimeout(() => searchProducts(), 100);
+              }}
+              className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-600 transition-colors"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Trending Horizontal Row */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <span className="text-orange-500">Trending</span> Products
-        </h3>
-        {SUPPLIER_PRODUCTS.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-2">No Products Yet</h4>
-            <p className="text-gray-500 text-sm mb-4">Connect your CJ Dropshipping API in Settings to discover trending products.</p>
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
-              Go to Settings
-            </button>
+      {/* Error Message */}
+      {error && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start gap-3">
+          <div className="w-5 h-5 text-yellow-600 mt-0.5">⚠️</div>
+          <div>
+            <p className="text-yellow-800 font-medium">{error}</p>
+            <p className="text-yellow-600 text-sm mt-1">
+              Settings → API Keys bölümünden CJ API anahtarınızı ekleyin.
+            </p>
           </div>
-        ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {SUPPLIER_PRODUCTS.slice(0, 10).map((product) => (
-              <div key={product.id} className="min-w-[220px] bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all group shrink-0">
-                 <div className="h-36 overflow-hidden relative">
-                  <img src={product.images[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="" />
-                  <div className="absolute top-2 right-2 bg-indigo-600 text-white text-xs font-medium px-2 py-1 rounded-lg">TRENDING</div>
-                 </div>
-                 <div className="p-4 space-y-2">
-                  <h4 className="font-semibold text-gray-900 text-sm truncate">{product.title}</h4>
-                  <p className="text-xs text-gray-500">Cost: ${product.costPrice.toFixed(2)}</p>
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-indigo-600 font-bold text-sm">${product.suggestedPrice}</span>
-                    <button onClick={() => handleOpenDetails(product)} className="text-xs font-medium bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">Details</button>
-                  </div>
-                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+        </div>
+      )}
 
-      {/* Main Grid Results */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">All Results ({filteredProducts.length})</h3>
-        {filteredProducts.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
-            <h4 className="font-semibold text-gray-900 text-lg mb-2">No Products Found</h4>
-            <p className="text-gray-500 mb-6">Connect your CJ Dropshipping API key in Settings to start discovering products.</p>
+      {/* Results */}
+      {!hasSearched ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ShoppingBag className="w-10 h-10 text-indigo-600" />
           </div>
-        ) : (
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Ürün Aramaya Başlayın</h3>
+          <p className="text-gray-500 max-w-md mx-auto mb-6">
+            Yukarıdaki arama kutusuna ürün adı yazın ve CJ Dropshipping kataloğunda arama yapın.
+          </p>
+          <div className="flex justify-center gap-8 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-green-500" />
+              <span>Trend ürünler</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-blue-500" />
+              <span>Kar marjı hesaplama</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Package className="w-4 h-4 text-purple-500" />
+              <span>Tek tıkla import</span>
+            </div>
+          </div>
+        </div>
+      ) : products.length > 0 ? (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Sonuçlar ({products.length} ürün)
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => {
+            {products.map((product) => {
               const stats = calculateProfit(product.costPrice, product.suggestedPrice, 5.00);
               return (
-                <div key={product.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all group flex flex-col">
-                  <div className="h-48 overflow-hidden relative">
-                    <img src={product.images[0]} className="w-full h-full object-cover" alt="" />
-                    <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg font-medium">
-                      {product.rating} ({(product.sold/1000).toFixed(1)}k sold)
+                <div key={product.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                  <div className="h-48 bg-gray-100 relative">
+                    <img
+                      src={product.images[0]}
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400?text=No+Image';
+                      }}
+                    />
+                    <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg">
+                      ⭐ {product.rating} ({product.sold}+ sold)
                     </div>
                   </div>
-                  <div className="p-5 space-y-4 flex-1 flex flex-col">
-                    <h4 className="font-semibold text-gray-900 leading-tight line-clamp-2">{product.title}</h4>
+                  <div className="p-4 space-y-3">
+                    <h4 className="font-semibold text-gray-900 line-clamp-2 min-h-[48px]">
+                      {product.title}
+                    </h4>
 
-                    <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t border-gray-100">
+                    <div className="flex justify-between text-sm">
                       <div>
-                        <p className="text-gray-400 text-xs">Cost</p>
-                        <p className="font-semibold text-gray-700">${product.costPrice.toFixed(2)}</p>
+                        <span className="text-gray-500">Maliyet:</span>
+                        <span className="font-semibold text-gray-900 ml-1">${product.costPrice.toFixed(2)}</span>
                       </div>
                       <div>
-                        <p className="text-gray-400 text-xs">Price</p>
-                        <p className="font-semibold text-gray-900">${product.suggestedPrice.toFixed(2)}</p>
+                        <span className="text-gray-500">Satış:</span>
+                        <span className="font-semibold text-indigo-600 ml-1">${product.suggestedPrice.toFixed(2)}</span>
                       </div>
                     </div>
 
-                    <div className="bg-indigo-50 p-3 rounded-lg">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-indigo-600 font-medium">Est. Profit</span>
-                        <span className="bg-indigo-600 text-white px-2 py-0.5 rounded font-medium">{stats.margin.toFixed(0)}% Margin</span>
-                      </div>
-                      <p className="text-indigo-700 font-bold text-lg mt-1">${stats.profit.toFixed(2)}</p>
+                    <div className="bg-green-50 rounded-lg p-2 text-center">
+                      <span className="text-green-700 font-semibold">
+                        💰 ${stats.profit.toFixed(2)} kar ({stats.margin.toFixed(0)}%)
+                      </span>
                     </div>
 
-                    <div className="flex gap-2 pt-2 mt-auto">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => handleOpenDetails(product)}
-                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors text-gray-700"
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
                       >
-                        View Details
+                        Detay
                       </button>
                       <button
                         onClick={() => handleImport(product, product.suggestedPrice.toString())}
-                        className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-all"
+                        className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
                       >
-                        + Import
+                        + Ekle
                       </button>
                     </div>
                   </div>
@@ -230,118 +320,109 @@ const ProductResearch: React.FC = () => {
               );
             })}
           </div>
-        )}
-      </section>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Search className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="font-semibold text-gray-900 mb-2">Ürün Bulunamadı</h3>
+          <p className="text-gray-500">Farklı anahtar kelimeler veya kategori deneyin.</p>
+        </div>
+      )}
 
-      {/* DETAIL MODAL */}
+      {/* Detail Modal */}
       {selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedProduct(null)}></div>
-          <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
-            {/* Left: Images */}
-            <div className="md:w-1/2 bg-gray-50 flex items-center justify-center p-6 overflow-y-auto">
-              <div className="space-y-4 w-full">
-                <img src={selectedProduct.images[0]} className="w-full aspect-square object-cover rounded-xl border border-gray-200" alt="" />
-                <div className="grid grid-cols-4 gap-2">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
-                      <img src={`https://picsum.photos/seed/${selectedProduct.id}${i}/300/300`} className="w-full h-full object-cover" alt="" />
-                    </div>
-                  ))}
-                </div>
+          <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedProduct(null)} />
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl relative overflow-hidden max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setSelectedProduct(null)}
+              className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 rounded-full z-10"
+            >
+              ✕
+            </button>
+
+            <div className="p-6 space-y-6">
+              {/* Product Image */}
+              <div className="aspect-video bg-gray-100 rounded-xl overflow-hidden">
+                <img
+                  src={selectedProduct.images[0]}
+                  alt={selectedProduct.title}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x400?text=No+Image';
+                  }}
+                />
               </div>
-            </div>
 
-            {/* Right: Info & Calculator */}
-            <div className="md:w-1/2 p-6 overflow-y-auto space-y-6">
-              <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <span className="bg-indigo-600 text-white text-xs font-medium px-2 py-1 rounded">CJ Dropshipping</span>
-                  <span className="text-gray-400 text-sm">{selectedProduct.category}</span>
-                </div>
+              {/* Product Info */}
+              <div>
                 <h3 className="text-xl font-bold text-gray-900">{selectedProduct.title}</h3>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span className="text-yellow-500">{selectedProduct.rating}</span>
-                  <span>{selectedProduct.sold.toLocaleString()} sold</span>
-                  <span>{selectedProduct.shippingTime}</span>
+                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                  <span>⭐ {selectedProduct.rating}</span>
+                  <span>{selectedProduct.sold}+ satış</span>
+                  <span>📦 {selectedProduct.shippingTime}</span>
                 </div>
+                <p className="text-gray-600 mt-3">{selectedProduct.description}</p>
               </div>
 
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-900 text-sm">Description</h4>
-                <p className="text-gray-500 text-sm leading-relaxed">{selectedProduct.description}</p>
-              </div>
-
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-900 text-sm">Variants</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedProduct.variants.map(v => (
-                    <span key={v} className="px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-700">{v}</span>
-                  ))}
+              {/* Variants */}
+              {selectedProduct.variants.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Varyantlar</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProduct.variants.map(v => (
+                      <span key={v} className="px-3 py-1 bg-gray-100 rounded-lg text-sm">{v}</span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Profit Calculator */}
-              <div className="bg-gray-900 p-6 rounded-xl text-white space-y-4">
-                <h4 className="font-semibold text-indigo-400 text-sm flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                  Profit Calculator
-                </h4>
+              <div className="bg-gray-900 rounded-xl p-6 text-white space-y-4">
+                <h4 className="font-semibold text-indigo-400">Kar Hesaplama</h4>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs text-gray-400">Supplier Cost</label>
-                    <div className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-300 font-medium">
-                      ${selectedProduct.costPrice.toFixed(2)}
-                    </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs text-gray-400">Maliyet</label>
+                    <div className="text-lg font-bold">${selectedProduct.costPrice.toFixed(2)}</div>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-gray-400">Shipping Cost</label>
+                  <div>
+                    <label className="text-xs text-gray-400">Kargo</label>
                     <input
                       type="number"
                       value={shippingCost}
                       onChange={(e) => setShippingCost(e.target.value)}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white font-medium outline-none focus:border-indigo-500"
+                      className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-white"
                     />
                   </div>
-                  <div className="space-y-1 col-span-2">
-                    <label className="text-xs text-gray-400">Your Selling Price</label>
+                  <div>
+                    <label className="text-xs text-gray-400">Satış Fiyatı</label>
                     <input
                       type="number"
                       value={sellingPrice}
                       onChange={(e) => setSellingPrice(e.target.value)}
-                      className="w-full bg-indigo-600 border border-indigo-500 rounded-lg py-3 px-4 text-white text-lg font-bold outline-none focus:ring-2 focus:ring-indigo-400"
+                      className="w-full bg-indigo-600 border border-indigo-500 rounded px-2 py-1 text-white font-bold"
                     />
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-800 grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-400">Platform Fees (3%)</p>
-                    <p className="text-lg font-semibold">${profitStats?.fees.toFixed(2)}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400">Profit Margin</p>
-                    <p className="text-lg font-semibold text-green-400">{profitStats?.margin.toFixed(1)}%</p>
-                  </div>
+                <div className="flex justify-between items-center pt-4 border-t border-gray-700">
+                  <span className="text-gray-400">Tahmini Kar:</span>
+                  <span className="text-2xl font-bold text-green-400">
+                    ${profitStats?.profit.toFixed(2)} ({profitStats?.margin.toFixed(0)}%)
+                  </span>
                 </div>
-
-                <div className="bg-green-500/20 border border-green-500/30 p-4 rounded-lg flex justify-between items-center">
-                  <span className="font-medium text-green-400">Total Profit Per Sale</span>
-                  <span className="text-2xl font-bold text-green-400">${profitStats?.profit.toFixed(2)}</span>
-                </div>
-
-                <button
-                  onClick={() => handleImport(selectedProduct, sellingPrice)}
-                  className="w-full py-3 bg-white hover:bg-gray-100 text-gray-900 font-semibold rounded-lg transition-all"
-                >
-                  Import This Product
-                </button>
               </div>
+
+              {/* Action Button */}
+              <button
+                onClick={() => handleImport(selectedProduct, sellingPrice)}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-colors"
+              >
+                Ürünlere Ekle
+              </button>
             </div>
           </div>
         </div>
