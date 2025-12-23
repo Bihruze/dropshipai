@@ -8,13 +8,13 @@ const CATEGORIES = [
   "Sports", "Car Accessories", "Baby", "Fashion", "Toys"
 ];
 
-type SourceType = 'ebay' | 'cj' | 'demo';
+type SourceType = 'google' | 'ebay' | 'cj' | 'demo';
 
 const ProductResearch: React.FC = () => {
   const { importProduct, settings } = useStore();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
-  const [source, setSource] = useState<SourceType>('ebay');
+  const [source, setSource] = useState<SourceType>('google');
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,9 +50,18 @@ const ProductResearch: React.FC = () => {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const endpoint = source === 'ebay'
-        ? `/api/ebay/products/search?keyword=${encodeURIComponent(search)}`
-        : `/api/cj/products/search?keyword=${encodeURIComponent(search)}&category=${category !== 'All' ? category : ''}`;
+      let endpoint = '';
+      switch (source) {
+        case 'google':
+          endpoint = `/api/google/products/search?keyword=${encodeURIComponent(search)}`;
+          break;
+        case 'ebay':
+          endpoint = `/api/ebay/products/search?keyword=${encodeURIComponent(search)}`;
+          break;
+        case 'cj':
+          endpoint = `/api/cj/products/search?keyword=${encodeURIComponent(search)}&category=${category !== 'All' ? category : ''}`;
+          break;
+      }
 
       const response = await fetch(`${apiUrl}${endpoint}`, {
         headers: {
@@ -159,7 +168,17 @@ const ProductResearch: React.FC = () => {
       {/* Search Section */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         {/* Source Selector */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSource('google')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              source === 'google'
+                ? 'bg-red-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🔍 Google Shopping
+          </button>
           <button
             onClick={() => setSource('ebay')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -178,7 +197,7 @@ const ProductResearch: React.FC = () => {
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            📦 CJ Dropshipping
+            📦 CJ
           </button>
           <button
             onClick={() => setSource('demo')}
