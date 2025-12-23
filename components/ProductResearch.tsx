@@ -8,10 +8,13 @@ const CATEGORIES = [
   "Sports", "Car Accessories", "Baby", "Fashion", "Toys"
 ];
 
+type SourceType = 'ebay' | 'cj' | 'demo';
+
 const ProductResearch: React.FC = () => {
   const { importProduct, settings } = useStore();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [source, setSource] = useState<SourceType>('ebay');
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,9 +41,20 @@ const ProductResearch: React.FC = () => {
     setError(null);
     setHasSearched(true);
 
+    // Demo mode - no API needed
+    if (source === 'demo') {
+      setProducts(getDemoProducts(search));
+      setLoading(false);
+      return;
+    }
+
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${apiUrl}/api/cj/products/search?keyword=${encodeURIComponent(search)}&category=${category !== 'All' ? category : ''}`, {
+      const endpoint = source === 'ebay'
+        ? `/api/ebay/products/search?keyword=${encodeURIComponent(search)}`
+        : `/api/cj/products/search?keyword=${encodeURIComponent(search)}&category=${category !== 'All' ? category : ''}`;
+
+      const response = await fetch(`${apiUrl}${endpoint}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -139,11 +153,45 @@ const ProductResearch: React.FC = () => {
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Ürün Araştırma</h2>
-        <p className="text-gray-500 mt-1">CJ Dropshipping'den ürün arayın ve mağazanıza ekleyin</p>
+        <p className="text-gray-500 mt-1">eBay, CJ Dropshipping veya demo kaynaklardan ürün arayın</p>
       </div>
 
       {/* Search Section */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        {/* Source Selector */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setSource('ebay')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              source === 'ebay'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🛒 eBay
+          </button>
+          <button
+            onClick={() => setSource('cj')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              source === 'cj'
+                ? 'bg-orange-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            📦 CJ Dropshipping
+          </button>
+          <button
+            onClick={() => setSource('demo')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              source === 'demo'
+                ? 'bg-purple-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🎭 Demo
+          </button>
+        </div>
+
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -156,15 +204,17 @@ const ProductResearch: React.FC = () => {
               className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[180px]"
-          >
-            {CATEGORIES.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
+          {source === 'cj' && (
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[180px]"
+            >
+              {CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          )}
           <button
             onClick={searchProducts}
             disabled={loading}
@@ -218,7 +268,7 @@ const ProductResearch: React.FC = () => {
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Ürün Aramaya Başlayın</h3>
           <p className="text-gray-500 max-w-md mx-auto mb-6">
-            Yukarıdaki arama kutusuna ürün adı yazın ve CJ Dropshipping kataloğunda arama yapın.
+            Kaynak seçin (eBay, CJ veya Demo), arama kutusuna ürün adı yazın ve arayın.
           </p>
           <div className="flex justify-center gap-8 text-sm text-gray-500">
             <div className="flex items-center gap-2">

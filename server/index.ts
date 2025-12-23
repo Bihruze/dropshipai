@@ -10,6 +10,7 @@ import settingsRoutes from './routes/settings.js';
 import shopifyRoutes from './routes/shopify.js';
 import etsyRoutes from './routes/etsy.js';
 import cjRoutes from './routes/cj.js';
+import ebayRoutes from './routes/ebay.js';
 import agentRoutes from './routes/agents.js';
 
 // Import middleware
@@ -84,6 +85,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/shopify', shopifyRoutes);
 app.use('/api/etsy', etsyRoutes);
 app.use('/api/cj', cjRoutes);
+app.use('/api/ebay', ebayRoutes);
 app.use('/api/agents', agentRoutes);
 
 // 404 handler
