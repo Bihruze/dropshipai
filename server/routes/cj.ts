@@ -26,8 +26,8 @@ router.post('/test', authMiddleware, asyncHandler(async (req: AuthenticatedReque
   res.json(result);
 }));
 
-// GET /api/cj/products/search
-router.get('/products/search', authMiddleware, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+// GET /api/cj/products/search (public - read only)
+router.get('/products/search', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const cj = getCJService();
   const result = await cj.searchProducts({
     keyword: req.query.keyword as string,
@@ -38,15 +38,15 @@ router.get('/products/search', authMiddleware, asyncHandler(async (req: Authenti
   res.json(result);
 }));
 
-// GET /api/cj/products/:id
-router.get('/products/:id', authMiddleware, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+// GET /api/cj/products/:id (public - read only)
+router.get('/products/:id', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const cj = getCJService();
   const result = await cj.getProduct(req.params.id);
   res.json(result);
 }));
 
-// GET /api/cj/categories
-router.get('/categories', authMiddleware, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+// GET /api/cj/categories (public - read only)
+router.get('/categories', asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
   const cj = getCJService();
   const result = await cj.getCategories();
   res.json(result);
