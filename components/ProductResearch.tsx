@@ -7,138 +7,8 @@ const CATEGORIES = [
   "Sports", "Car Accessories", "Baby", "Fashion"
 ];
 
-const MOCK_SUPPLIER_PRODUCTS: SupplierProduct[] = [
-  {
-    id: "cj-001",
-    title: "Self-Cleaning Pet Slicker Brush",
-    description: "Professional pet grooming brush with one-click cleaning. Perfect for removing loose fur, dander, and trapped dirt from cats and dogs of all sizes.",
-    images: ["https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=500&h=500&fit=crop"],
-    costPrice: 8.50,
-    suggestedPrice: 24.99,
-    category: "Pet Supplies",
-    rating: 4.8,
-    sold: 12500,
-    shippingTime: "7-15 days",
-    variants: ["Blue", "Pink", "Green"]
-  },
-  {
-    id: "cj-002",
-    title: "Magnetic Car Phone Holder Mount",
-    description: "Universal magnetic phone mount for car dashboard. Features powerful magnets and a 360-degree rotation base for optimal viewing angles.",
-    images: ["https://images.unsplash.com/photo-1586105251261-72a756657311?w=500&h=500&fit=crop"],
-    costPrice: 5.20,
-    suggestedPrice: 18.99,
-    category: "Car Accessories",
-    rating: 4.6,
-    sold: 8900,
-    shippingTime: "7-12 days",
-    variants: ["Black", "Silver"]
-  },
-  {
-    id: "cj-003",
-    title: "Mini Desktop Humidifier",
-    description: "Ultra-quiet USB-powered humidifier for home or office. Improves air quality and skin hydration in personal spaces.",
-    images: ["https://images.unsplash.com/photo-1585672841585-780d6034f40f?w=500&h=500&fit=crop"],
-    costPrice: 12.40,
-    suggestedPrice: 29.99,
-    category: "Home & Garden",
-    rating: 4.7,
-    sold: 5200,
-    shippingTime: "8-14 days",
-    variants: ["White", "Navy", "Gray"]
-  },
-  {
-    id: "cj-004",
-    title: "Wireless Sleep Headphones",
-    description: "Comfortable headband with built-in Bluetooth speakers. Ideal for side sleepers, insomnia, and listening to white noise.",
-    images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop"],
-    costPrice: 15.00,
-    suggestedPrice: 39.99,
-    category: "Electronics",
-    rating: 4.5,
-    sold: 11000,
-    shippingTime: "10-15 days",
-    variants: ["Black", "Gray"]
-  },
-  {
-    id: "cj-005",
-    title: "Reusable Silicone Food Bags",
-    description: "Eco-friendly, leak-proof storage bags for snacks, leftovers, and freezing. Dishwasher and microwave safe.",
-    images: ["https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=500&h=500&fit=crop"],
-    costPrice: 4.50,
-    suggestedPrice: 15.99,
-    category: "Home & Garden",
-    rating: 4.9,
-    sold: 21000,
-    shippingTime: "7-12 days",
-    variants: ["Clear", "Assorted"]
-  },
-  {
-    id: "cj-006",
-    title: "Smart Water Bottle with LED Reminder",
-    description: "Tracks your hydration and glows to remind you to drink water. Syncs with a mobile app for detailed health metrics.",
-    images: ["https://images.unsplash.com/photo-1602143399827-7214fe73076f?w=500&h=500&fit=crop"],
-    costPrice: 24.00,
-    suggestedPrice: 59.99,
-    category: "Electronics",
-    rating: 4.4,
-    sold: 3400,
-    shippingTime: "12-18 days",
-    variants: ["Space Gray", "Mint"]
-  },
-  {
-    id: "cj-007",
-    title: "Electric Milk Frother & Steamer",
-    description: "Create barista-quality foam for lattes and cappuccinos in seconds. Compact design with stainless steel finish.",
-    images: ["https://images.unsplash.com/photo-1544923246-77307dd654ca?w=500&h=500&fit=crop"],
-    costPrice: 14.50,
-    suggestedPrice: 34.99,
-    category: "Home & Garden",
-    rating: 4.8,
-    sold: 15600,
-    shippingTime: "7-14 days",
-    variants: ["Black", "Silver"]
-  },
-  {
-    id: "cj-008",
-    title: "Muscle Massage Gun",
-    description: "Powerful percussion massager for deep tissue relief. Comes with 6 interchangeable heads and variable speeds.",
-    images: ["https://images.unsplash.com/photo-1544117518-33ef4f6a44a7?w=500&h=500&fit=crop"],
-    costPrice: 45.00,
-    suggestedPrice: 129.99,
-    category: "Sports",
-    rating: 4.7,
-    sold: 8700,
-    shippingTime: "10-20 days",
-    variants: ["Carbon Fiber", "Black"]
-  },
-  {
-    id: "cj-009",
-    title: "Travel Jewelry Organizer",
-    description: "Compact and stylish case for rings, necklaces, and earrings. Prevents tangling and keeps jewelry secure on the go.",
-    images: ["https://images.unsplash.com/photo-1584305116359-ef81daaf1fd9?w=500&h=500&fit=crop"],
-    costPrice: 9.00,
-    suggestedPrice: 24.99,
-    category: "Fashion",
-    rating: 4.6,
-    sold: 6200,
-    shippingTime: "7-12 days",
-    variants: ["Champagne", "Black"]
-  },
-  {
-    id: "cj-010",
-    title: "Solar Power Bank 20000mAh",
-    description: "Rugged external battery with solar charging capability. Waterproof and features a built-in LED flashlight.",
-    images: ["https://images.unsplash.com/photo-1620339656058-2bb8d83e39b9?w=500&h=500&fit=crop"],
-    costPrice: 21.00,
-    suggestedPrice: 49.99,
-    category: "Electronics",
-    rating: 4.5,
-    sold: 9100,
-    shippingTime: "12-18 days",
-    variants: ["Orange", "Blue"]
-  }
-];
+// Products will be loaded from CJ Dropshipping API when connected
+const SUPPLIER_PRODUCTS: SupplierProduct[] = [];
 
 const ProductResearch: React.FC = () => {
   const { importProduct } = useStore();
@@ -159,7 +29,7 @@ const ProductResearch: React.FC = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    return MOCK_SUPPLIER_PRODUCTS.filter(p => {
+    return SUPPLIER_PRODUCTS.filter(p => {
       const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
       const matchesCategory = category === 'All' || p.category === category;
       const matchesMin = minPrice === '' || p.costPrice >= parseFloat(minPrice);
@@ -259,81 +129,108 @@ const ProductResearch: React.FC = () => {
         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
           <span className="text-orange-500">Trending</span> Products
         </h3>
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {MOCK_SUPPLIER_PRODUCTS.slice(0, 10).map((product) => (
-            <div key={product.id} className="min-w-[220px] bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all group shrink-0">
-               <div className="h-36 overflow-hidden relative">
-                <img src={product.images[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="" />
-                <div className="absolute top-2 right-2 bg-indigo-600 text-white text-xs font-medium px-2 py-1 rounded-lg">TRENDING</div>
-               </div>
-               <div className="p-4 space-y-2">
-                <h4 className="font-semibold text-gray-900 text-sm truncate">{product.title}</h4>
-                <p className="text-xs text-gray-500">Cost: ${product.costPrice.toFixed(2)}</p>
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-indigo-600 font-bold text-sm">${product.suggestedPrice}</span>
-                  <button onClick={() => handleOpenDetails(product)} className="text-xs font-medium bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">Details</button>
-                </div>
-               </div>
+        {SUPPLIER_PRODUCTS.length === 0 ? (
+          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
-          ))}
-        </div>
+            <h4 className="font-semibold text-gray-900 mb-2">No Products Yet</h4>
+            <p className="text-gray-500 text-sm mb-4">Connect your CJ Dropshipping API in Settings to discover trending products.</p>
+            <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+              Go to Settings
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {SUPPLIER_PRODUCTS.slice(0, 10).map((product) => (
+              <div key={product.id} className="min-w-[220px] bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all group shrink-0">
+                 <div className="h-36 overflow-hidden relative">
+                  <img src={product.images[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="" />
+                  <div className="absolute top-2 right-2 bg-indigo-600 text-white text-xs font-medium px-2 py-1 rounded-lg">TRENDING</div>
+                 </div>
+                 <div className="p-4 space-y-2">
+                  <h4 className="font-semibold text-gray-900 text-sm truncate">{product.title}</h4>
+                  <p className="text-xs text-gray-500">Cost: ${product.costPrice.toFixed(2)}</p>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-indigo-600 font-bold text-sm">${product.suggestedPrice}</span>
+                    <button onClick={() => handleOpenDetails(product)} className="text-xs font-medium bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">Details</button>
+                  </div>
+                 </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Main Grid Results */}
       <section className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">All Results ({filteredProducts.length})</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => {
-            const stats = calculateProfit(product.costPrice, product.suggestedPrice, 5.00);
-            return (
-              <div key={product.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all group flex flex-col">
-                <div className="h-48 overflow-hidden relative">
-                  <img src={product.images[0]} className="w-full h-full object-cover" alt="" />
-                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg font-medium">
-                    {product.rating} ({(product.sold/1000).toFixed(1)}k sold)
+        {filteredProducts.length === 0 ? (
+          <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <h4 className="font-semibold text-gray-900 text-lg mb-2">No Products Found</h4>
+            <p className="text-gray-500 mb-6">Connect your CJ Dropshipping API key in Settings to start discovering products.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => {
+              const stats = calculateProfit(product.costPrice, product.suggestedPrice, 5.00);
+              return (
+                <div key={product.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all group flex flex-col">
+                  <div className="h-48 overflow-hidden relative">
+                    <img src={product.images[0]} className="w-full h-full object-cover" alt="" />
+                    <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg font-medium">
+                      {product.rating} ({(product.sold/1000).toFixed(1)}k sold)
+                    </div>
+                  </div>
+                  <div className="p-5 space-y-4 flex-1 flex flex-col">
+                    <h4 className="font-semibold text-gray-900 leading-tight line-clamp-2">{product.title}</h4>
+
+                    <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t border-gray-100">
+                      <div>
+                        <p className="text-gray-400 text-xs">Cost</p>
+                        <p className="font-semibold text-gray-700">${product.costPrice.toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs">Price</p>
+                        <p className="font-semibold text-gray-900">${product.suggestedPrice.toFixed(2)}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50 p-3 rounded-lg">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-indigo-600 font-medium">Est. Profit</span>
+                        <span className="bg-indigo-600 text-white px-2 py-0.5 rounded font-medium">{stats.margin.toFixed(0)}% Margin</span>
+                      </div>
+                      <p className="text-indigo-700 font-bold text-lg mt-1">${stats.profit.toFixed(2)}</p>
+                    </div>
+
+                    <div className="flex gap-2 pt-2 mt-auto">
+                      <button
+                        onClick={() => handleOpenDetails(product)}
+                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors text-gray-700"
+                      >
+                        View Details
+                      </button>
+                      <button
+                        onClick={() => handleImport(product, product.suggestedPrice.toString())}
+                        className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-all"
+                      >
+                        + Import
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="p-5 space-y-4 flex-1 flex flex-col">
-                  <h4 className="font-semibold text-gray-900 leading-tight line-clamp-2">{product.title}</h4>
-
-                  <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t border-gray-100">
-                    <div>
-                      <p className="text-gray-400 text-xs">Cost</p>
-                      <p className="font-semibold text-gray-700">${product.costPrice.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-xs">Price</p>
-                      <p className="font-semibold text-gray-900">${product.suggestedPrice.toFixed(2)}</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-indigo-50 p-3 rounded-lg">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-indigo-600 font-medium">Est. Profit</span>
-                      <span className="bg-indigo-600 text-white px-2 py-0.5 rounded font-medium">{stats.margin.toFixed(0)}% Margin</span>
-                    </div>
-                    <p className="text-indigo-700 font-bold text-lg mt-1">${stats.profit.toFixed(2)}</p>
-                  </div>
-
-                  <div className="flex gap-2 pt-2 mt-auto">
-                    <button
-                      onClick={() => handleOpenDetails(product)}
-                      className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors text-gray-700"
-                    >
-                      View Details
-                    </button>
-                    <button
-                      onClick={() => handleImport(product, product.suggestedPrice.toString())}
-                      className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-all"
-                    >
-                      + Import
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* DETAIL MODAL */}
