@@ -1,0 +1,9 @@
+
+{
+  "name": "DropshipAI",
+  "description": "An intelligent dropshipping automation platform powered by Gemini. Automate product research, SEO listings, and AI-driven image optimization.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
