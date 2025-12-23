@@ -55,13 +55,11 @@ const ProductResearch: React.FC = () => {
         }
       } else {
         // API bağlı değilse demo veri göster
-        setError('CJ API bağlantısı kurulamadı. Demo veriler gösteriliyor.');
         setProducts(getDemoProducts(search));
       }
     } catch (err) {
       console.error('Search error:', err);
       // API bağlı değilse demo veri göster
-      setError('Backend bağlantısı yok. Demo veriler gösteriliyor.');
       setProducts(getDemoProducts(search));
     } finally {
       setLoading(false);
@@ -204,16 +202,11 @@ const ProductResearch: React.FC = () => {
         </div>
       </div>
 
-      {/* Info Message */}
+      {/* Error Message - only shows for actual errors like no results */}
       {error && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
-          <div className="w-5 h-5 text-blue-600 mt-0.5">ℹ️</div>
-          <div>
-            <p className="text-blue-800 font-medium">Demo Modu</p>
-            <p className="text-blue-600 text-sm mt-1">
-              Şu an demo veriler gösteriliyor. Gerçek CJ ürünleri için backend'in Render'da deploy edilmesi gerekiyor.
-            </p>
-          </div>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start gap-3">
+          <div className="w-5 h-5 text-yellow-600 mt-0.5">⚠️</div>
+          <p className="text-yellow-800">{error}</p>
         </div>
       )}
 
