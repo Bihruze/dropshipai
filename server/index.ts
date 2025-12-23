@@ -12,6 +12,7 @@ import etsyRoutes from './routes/etsy.js';
 import cjRoutes from './routes/cj.js';
 import ebayRoutes from './routes/ebay.js';
 import googleRoutes from './routes/google.js';
+import aiRoutes from './routes/ai.js';
 import agentRoutes from './routes/agents.js';
 
 // Import middleware
@@ -88,6 +89,7 @@ app.use('/api/etsy', etsyRoutes);
 app.use('/api/cj', cjRoutes);
 app.use('/api/ebay', ebayRoutes);
 app.use('/api/google', googleRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/api/agents', agentRoutes);
 
 // 404 handler
