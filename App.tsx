@@ -11,19 +11,17 @@ import Orders from './components/Orders';
 import Reports from './components/Reports';
 import Settings from './components/Settings';
 import Login from './components/Login';
-import Register from './components/Register';
 import { useStore } from './store/useStore';
 
 const App: React.FC = () => {
   const { view, isAuthenticated } = useStore();
 
-  // Redirect to login if not authenticated and trying to access dashboard views
-  if (!isAuthenticated && view !== 'register') {
+  // Admin-only access - redirect to login if not authenticated
+  if (!isAuthenticated) {
     return <Login />;
   }
 
   if (view === 'login') return <Login />;
-  if (view === 'register') return <Register />;
 
   const renderView = () => {
     switch (view) {

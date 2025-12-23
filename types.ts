@@ -106,7 +106,6 @@ export interface Settings {
 
 export type ViewType =
   | 'login'
-  | 'register'
   | 'dashboard'
   | 'research'
   | 'ai-content'

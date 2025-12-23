@@ -1,49 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { useAuth } from '../contexts/AuthContext';
+
+// Admin credentials - hardcoded for single-user access
+const ADMIN_USERNAME = 'sehercare';
+const ADMIN_PASSWORD = 'Shopify2026#';
 
 const Login: React.FC = () => {
-  const { setView, login: storeLogin } = useStore();
-  const { login, error: authError, isLoading, clearError } = useAuth();
-  const [email, setEmail] = useState('');
+  const { login: storeLogin } = useStore();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [localError, setLocalError] = useState('');
-  const [useDemoMode, setUseDemoMode] = useState(false);
-
-  // Clear errors when inputs change
-  useEffect(() => {
-    if (localError) setLocalError('');
-    if (authError) clearError();
-  }, [email, password]);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLocalError('');
+    setError('');
+    setIsLoading(true);
 
-    if (!email || !password) {
-      setLocalError('Please fill in all fields');
+    // Simulate small delay for UX
+    await new Promise(r => setTimeout(r, 500));
+
+    if (!username || !password) {
+      setError('Please fill in all fields');
+      setIsLoading(false);
       return;
     }
 
-    if (useDemoMode) {
-      // Demo mode - use local store auth (no backend)
-      storeLogin(email, 'Demo User');
-      return;
+    // Check admin credentials
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      storeLogin('admin@dropshipai.com', 'Seher Admin');
+      localStorage.setItem('dropship_admin_auth', 'true');
+    } else {
+      setError('Invalid username or password');
     }
 
-    // Real authentication via backend
-    const success = await login(email, password);
-    if (success) {
-      // Sync with store for app state
-      storeLogin(email, email.split('@')[0]);
-    }
+    setIsLoading(false);
   };
-
-  const handleDemoLogin = () => {
-    storeLogin('demo@dropshipai.com', 'Demo User');
-  };
-
-  const displayError = localError || authError;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#030712] p-4">
@@ -52,20 +44,28 @@ const Login: React.FC = () => {
           <h1 className="text-4xl font-bold heading-font">
             <span className="text-blue-500">Dropship</span>AI
           </h1>
-          <p className="mt-2 text-gray-400">Welcome back! Please login to your account.</p>
+          <p className="mt-2 text-gray-400">Admin Panel Login</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {displayError && <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl">{displayError}</div>}
+          {error && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-xl flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {error}
+            </div>
+          )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-400">Email Address</label>
+            <label className="text-sm font-medium text-gray-400">Username</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@example.com"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter username"
               disabled={isLoading}
+              autoComplete="username"
               className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:border-blue-500 outline-none transition-all disabled:opacity-50"
             />
           </div>
@@ -78,6 +78,7 @@ const Login: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               disabled={isLoading}
+              autoComplete="current-password"
               className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 focus:border-blue-500 outline-none transition-all disabled:opacity-50"
             />
           </div>
@@ -96,33 +97,21 @@ const Login: React.FC = () => {
                 Signing in...
               </>
             ) : (
-              'Sign In'
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                Sign In
+              </>
             )}
           </button>
         </form>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-700"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-gray-900/50 text-gray-500">or</span>
-          </div>
+        <div className="text-center">
+          <p className="text-gray-600 text-xs">
+            🔒 Authorized personnel only
+          </p>
         </div>
-
-        <button
-          onClick={handleDemoLogin}
-          className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium py-3 rounded-xl transition-all border border-gray-700"
-        >
-          Try Demo Mode
-        </button>
-
-        <p className="text-center text-gray-500 text-sm">
-          Don't have an account?{' '}
-          <button onClick={() => setView('register')} className="text-blue-500 hover:underline font-semibold">
-            Register
-          </button>
-        </p>
       </div>
     </div>
   );
