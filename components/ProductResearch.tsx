@@ -3,7 +3,7 @@ import { useStore } from '../store/useStore';
 import { SupplierProduct } from '../types';
 
 const CATEGORIES = [
-  "All", "Electronics", "Home & Garden", "Pet Supplies", "Beauty", 
+  "All", "Electronics", "Home & Garden", "Pet Supplies", "Beauty",
   "Sports", "Car Accessories", "Baby", "Fashion"
 ];
 
@@ -22,7 +22,7 @@ const MOCK_SUPPLIER_PRODUCTS: SupplierProduct[] = [
     variants: ["Blue", "Pink", "Green"]
   },
   {
-    id: "cj-002", 
+    id: "cj-002",
     title: "Magnetic Car Phone Holder Mount",
     description: "Universal magnetic phone mount for car dashboard. Features powerful magnets and a 360-degree rotation base for optimal viewing angles.",
     images: ["https://images.unsplash.com/photo-1586105251261-72a756657311?w=500&h=500&fit=crop"],
@@ -189,88 +189,89 @@ const ProductResearch: React.FC = () => {
   const profitStats = useMemo(() => {
     if (!selectedProduct) return null;
     return calculateProfit(
-      selectedProduct.costPrice, 
-      parseFloat(sellingPrice) || 0, 
+      selectedProduct.costPrice,
+      parseFloat(sellingPrice) || 0,
       parseFloat(shippingCost) || 0
     );
   }, [selectedProduct, sellingPrice, shippingCost]);
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in duration-500 max-w-[1400px] mx-auto">
+    <div className="p-6 space-y-6">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed top-20 right-8 z-50 bg-green-600 text-white px-6 py-3 rounded-2xl shadow-xl font-bold border border-green-500 animate-in slide-in-from-right-full">
+        <div className="fixed top-20 right-6 z-50 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg font-medium">
           {toast}
         </div>
       )}
 
       <div>
-        <h2 className="text-3xl font-extrabold heading-font text-slate-900">Product Research</h2>
-        <p className="text-slate-500">Discover and source winning products directly from global suppliers.</p>
+        <h2 className="text-2xl font-bold text-gray-900">Product Research</h2>
+        <p className="text-gray-500 mt-1">Discover and source winning products directly from global suppliers.</p>
       </div>
 
       {/* Filter Section */}
-      <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2 relative">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <input 
-              type="text" 
-              placeholder="Search products..." 
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <input
+              type="text"
+              placeholder="Search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 focus:border-blue-500 outline-none transition-all text-slate-800"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900"
             />
           </div>
-          <select 
+          <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 outline-none focus:border-blue-500 transition-all text-slate-800"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
           >
             {CATEGORIES.map(cat => <option key={cat}>{cat}</option>)}
           </select>
           <div className="flex gap-2">
-            <input 
-              type="number" 
-              placeholder="Min $" 
+            <input
+              type="number"
+              placeholder="Min $"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              className="w-1/2 bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 outline-none focus:border-blue-500 transition-all text-slate-800"
+              className="w-1/2 bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
             />
-            <input 
-              type="number" 
-              placeholder="Max $" 
+            <input
+              type="number"
+              placeholder="Max $"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-1/2 bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 outline-none focus:border-blue-500 transition-all text-slate-800"
+              className="w-1/2 bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
             />
           </div>
         </div>
-        <div className="flex gap-4">
-          <button onClick={() => { setSearch(''); setCategory('All'); setMinPrice(''); setMaxPrice(''); }} className="text-slate-500 font-bold text-sm hover:underline">
-            Clear Filters
-          </button>
-        </div>
+        <button
+          onClick={() => { setSearch(''); setCategory('All'); setMinPrice(''); setMaxPrice(''); }}
+          className="text-gray-500 font-medium text-sm hover:text-indigo-600"
+        >
+          Clear Filters
+        </button>
       </div>
 
       {/* Trending Horizontal Row */}
       <section className="space-y-4">
-        <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-          <span>🔥</span> Trending Products
+        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <span className="text-orange-500">Trending</span> Products
         </h3>
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+        <div className="flex gap-4 overflow-x-auto pb-4">
           {MOCK_SUPPLIER_PRODUCTS.slice(0, 10).map((product) => (
-            <div key={product.id} className="min-w-[240px] bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-lg transition-all group shrink-0">
-               <div className="h-40 overflow-hidden relative">
-                <img src={product.images[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
-                <div className="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg">TRENDING</div>
+            <div key={product.id} className="min-w-[220px] bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all group shrink-0">
+               <div className="h-36 overflow-hidden relative">
+                <img src={product.images[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="" />
+                <div className="absolute top-2 right-2 bg-indigo-600 text-white text-xs font-medium px-2 py-1 rounded-lg">TRENDING</div>
                </div>
-               <div className="p-4 space-y-1">
-                <h4 className="font-bold text-slate-900 text-sm truncate">{product.title}</h4>
-                <p className="text-xs text-slate-500">Cost: ${product.costPrice.toFixed(2)}</p>
+               <div className="p-4 space-y-2">
+                <h4 className="font-semibold text-gray-900 text-sm truncate">{product.title}</h4>
+                <p className="text-xs text-gray-500">Cost: ${product.costPrice.toFixed(2)}</p>
                 <div className="flex justify-between items-center pt-2">
-                  <span className="text-blue-600 font-bold text-sm">${product.suggestedPrice}</span>
-                  <button onClick={() => handleOpenDetails(product)} className="text-[10px] font-bold bg-slate-100 px-3 py-1 rounded-lg hover:bg-slate-200 transition-colors uppercase">Details</button>
+                  <span className="text-indigo-600 font-bold text-sm">${product.suggestedPrice}</span>
+                  <button onClick={() => handleOpenDetails(product)} className="text-xs font-medium bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">Details</button>
                 </div>
                </div>
             </div>
@@ -280,50 +281,50 @@ const ProductResearch: React.FC = () => {
 
       {/* Main Grid Results */}
       <section className="space-y-4">
-        <h3 className="text-xl font-bold text-slate-900">All Results ({filteredProducts.length})</h3>
+        <h3 className="text-lg font-semibold text-gray-900">All Results ({filteredProducts.length})</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => {
             const stats = calculateProfit(product.costPrice, product.suggestedPrice, 5.00);
             return (
-              <div key={product.id} className="bg-white border border-gray-100 rounded-3xl overflow-hidden hover:border-blue-500/50 hover:shadow-xl transition-all group flex flex-col">
-                <div className="h-56 overflow-hidden relative">
+              <div key={product.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all group flex flex-col">
+                <div className="h-48 overflow-hidden relative">
                   <img src={product.images[0]} className="w-full h-full object-cover" alt="" />
-                  <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white text-[10px] px-2 py-1 rounded-lg font-bold">
-                    ⭐ {product.rating} ({ (product.sold/1000).toFixed(1) }k sold)
+                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg font-medium">
+                    {product.rating} ({(product.sold/1000).toFixed(1)}k sold)
                   </div>
                 </div>
-                <div className="p-6 space-y-4 flex-1 flex flex-col">
-                  <h4 className="font-bold text-slate-900 text-lg leading-tight line-clamp-2">{product.title}</h4>
-                  
-                  <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t border-slate-50">
+                <div className="p-5 space-y-4 flex-1 flex flex-col">
+                  <h4 className="font-semibold text-gray-900 leading-tight line-clamp-2">{product.title}</h4>
+
+                  <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t border-gray-100">
                     <div>
-                      <p className="text-slate-400 text-xs">Cost</p>
-                      <p className="font-bold text-slate-700">${product.costPrice.toFixed(2)}</p>
+                      <p className="text-gray-400 text-xs">Cost</p>
+                      <p className="font-semibold text-gray-700">${product.costPrice.toFixed(2)}</p>
                     </div>
                     <div>
-                      <p className="text-slate-400 text-xs">Price</p>
-                      <p className="font-bold text-slate-900">${product.suggestedPrice.toFixed(2)}</p>
+                      <p className="text-gray-400 text-xs">Price</p>
+                      <p className="font-semibold text-gray-900">${product.suggestedPrice.toFixed(2)}</p>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 p-3 rounded-2xl">
+                  <div className="bg-indigo-50 p-3 rounded-lg">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-blue-500 font-bold">Est. Profit</span>
-                      <span className="bg-blue-600 text-white px-2 py-0.5 rounded-lg font-bold">{stats.margin.toFixed(0)}% Margin</span>
+                      <span className="text-indigo-600 font-medium">Est. Profit</span>
+                      <span className="bg-indigo-600 text-white px-2 py-0.5 rounded font-medium">{stats.margin.toFixed(0)}% Margin</span>
                     </div>
-                    <p className="text-blue-700 font-extrabold text-lg mt-1">${stats.profit.toFixed(2)}</p>
+                    <p className="text-indigo-700 font-bold text-lg mt-1">${stats.profit.toFixed(2)}</p>
                   </div>
 
                   <div className="flex gap-2 pt-2 mt-auto">
-                    <button 
+                    <button
                       onClick={() => handleOpenDetails(product)}
-                      className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold border border-slate-200 hover:bg-slate-50 transition-colors"
+                      className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors text-gray-700"
                     >
                       View Details
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleImport(product, product.suggestedPrice.toString())}
-                      className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all shadow-md shadow-blue-600/20"
+                      className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-all"
                     >
                       + Import
                     </button>
@@ -337,16 +338,16 @@ const ProductResearch: React.FC = () => {
 
       {/* DETAIL MODAL */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSelectedProduct(null)}></div>
-          <div className="bg-white w-full max-w-5xl rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedProduct(null)}></div>
+          <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl relative overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
             {/* Left: Images */}
-            <div className="md:w-1/2 bg-slate-50 flex items-center justify-center p-8 overflow-y-auto scrollbar-hide">
+            <div className="md:w-1/2 bg-gray-50 flex items-center justify-center p-6 overflow-y-auto">
               <div className="space-y-4 w-full">
-                <img src={selectedProduct.images[0]} className="w-full aspect-square object-cover rounded-3xl border border-slate-200 shadow-lg" alt="" />
+                <img src={selectedProduct.images[0]} className="w-full aspect-square object-cover rounded-xl border border-gray-200" alt="" />
                 <div className="grid grid-cols-4 gap-2">
                   {[1,2,3,4].map(i => (
-                    <div key={i} className="aspect-square bg-slate-200 rounded-xl overflow-hidden border border-slate-300">
+                    <div key={i} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
                       <img src={`https://picsum.photos/seed/${selectedProduct.id}${i}/300/300`} className="w-full h-full object-cover" alt="" />
                     </div>
                   ))}
@@ -355,94 +356,91 @@ const ProductResearch: React.FC = () => {
             </div>
 
             {/* Right: Info & Calculator */}
-            <div className="md:w-1/2 p-10 overflow-y-auto scrollbar-hide space-y-8">
-              <button onClick={() => setSelectedProduct(null)} className="absolute top-6 right-6 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
+            <div className="md:w-1/2 p-6 overflow-y-auto space-y-6">
+              <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
 
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider">CJ Dropshipping</span>
-                  <span className="text-slate-400 text-sm">{selectedProduct.category}</span>
+                  <span className="bg-indigo-600 text-white text-xs font-medium px-2 py-1 rounded">CJ Dropshipping</span>
+                  <span className="text-gray-400 text-sm">{selectedProduct.category}</span>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900">{selectedProduct.title}</h3>
-                <div className="flex items-center gap-4 text-sm font-medium text-slate-500">
-                  <span className="flex items-center gap-1 text-orange-500">⭐ {selectedProduct.rating}</span>
-                  <span>{selectedProduct.sold} sold</span>
-                  <span className="flex items-center gap-1 text-slate-400">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                    {selectedProduct.shippingTime} delivery
-                  </span>
+                <h3 className="text-xl font-bold text-gray-900">{selectedProduct.title}</h3>
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <span className="text-yellow-500">{selectedProduct.rating}</span>
+                  <span>{selectedProduct.sold.toLocaleString()} sold</span>
+                  <span>{selectedProduct.shippingTime}</span>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <h4 className="font-bold text-slate-900 uppercase tracking-widest text-xs">Description</h4>
-                <p className="text-slate-500 text-sm leading-relaxed">{selectedProduct.description}</p>
+              <div className="space-y-2">
+                <h4 className="font-semibold text-gray-900 text-sm">Description</h4>
+                <p className="text-gray-500 text-sm leading-relaxed">{selectedProduct.description}</p>
               </div>
 
-              <div className="space-y-4">
-                <h4 className="font-bold text-slate-900 uppercase tracking-widest text-xs">Variants</h4>
+              <div className="space-y-2">
+                <h4 className="font-semibold text-gray-900 text-sm">Variants</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedProduct.variants.map(v => (
-                    <span key={v} className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700">{v}</span>
+                    <span key={v} className="px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-700">{v}</span>
                   ))}
                 </div>
               </div>
 
               {/* Profit Calculator */}
-              <div className="bg-slate-900 p-8 rounded-[2rem] text-white space-y-6">
-                <h4 className="font-bold text-blue-400 uppercase tracking-widest text-xs flex items-center gap-2">
+              <div className="bg-gray-900 p-6 rounded-xl text-white space-y-4">
+                <h4 className="font-semibold text-indigo-400 text-sm flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                   Profit Calculator
                 </h4>
-                
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase">Supplier Cost</label>
-                    <div className="bg-slate-800 border border-slate-700 rounded-xl py-2 px-4 text-slate-300 font-bold">
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs text-gray-400">Supplier Cost</label>
+                    <div className="bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-300 font-medium">
                       ${selectedProduct.costPrice.toFixed(2)}
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase">Shipping Cost</label>
-                    <input 
-                      type="number" 
+                  <div className="space-y-1">
+                    <label className="text-xs text-gray-400">Shipping Cost</label>
+                    <input
+                      type="number"
                       value={shippingCost}
                       onChange={(e) => setShippingCost(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-4 text-white font-bold outline-none focus:border-blue-500 transition-all"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-white font-medium outline-none focus:border-indigo-500"
                     />
                   </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase">Your Selling Price</label>
-                    <input 
-                      type="number" 
+                  <div className="space-y-1 col-span-2">
+                    <label className="text-xs text-gray-400">Your Selling Price</label>
+                    <input
+                      type="number"
                       value={sellingPrice}
                       onChange={(e) => setSellingPrice(e.target.value)}
-                      className="w-full bg-blue-600 border border-blue-500 rounded-xl py-3 px-6 text-white text-xl font-extrabold outline-none focus:ring-4 ring-blue-500/20 transition-all"
+                      className="w-full bg-indigo-600 border border-indigo-500 rounded-lg py-3 px-4 text-white text-lg font-bold outline-none focus:ring-2 focus:ring-indigo-400"
                     />
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-slate-800 grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Platform Fees (3%)</p>
-                    <p className="text-lg font-bold">${profitStats?.fees.toFixed(2)}</p>
+                <div className="pt-4 border-t border-gray-800 grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-400">Platform Fees (3%)</p>
+                    <p className="text-lg font-semibold">${profitStats?.fees.toFixed(2)}</p>
                   </div>
-                  <div className="space-y-1 text-right">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Profit Margin</p>
-                    <p className="text-lg font-bold text-green-400">{profitStats?.margin.toFixed(1)}%</p>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-400">Profit Margin</p>
+                    <p className="text-lg font-semibold text-green-400">{profitStats?.margin.toFixed(1)}%</p>
                   </div>
                 </div>
 
-                <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl flex justify-between items-center">
-                  <span className="font-bold text-green-400">Total Profit Per Sale</span>
-                  <span className="text-2xl font-black text-green-400">${profitStats?.profit.toFixed(2)}</span>
+                <div className="bg-green-500/20 border border-green-500/30 p-4 rounded-lg flex justify-between items-center">
+                  <span className="font-medium text-green-400">Total Profit Per Sale</span>
+                  <span className="text-2xl font-bold text-green-400">${profitStats?.profit.toFixed(2)}</span>
                 </div>
 
-                <button 
+                <button
                   onClick={() => handleImport(selectedProduct, sellingPrice)}
-                  className="w-full py-4 bg-white hover:bg-slate-100 text-slate-900 font-black rounded-2xl transition-all shadow-xl shadow-white/5 active:scale-[0.98]"
+                  className="w-full py-3 bg-white hover:bg-gray-100 text-gray-900 font-semibold rounded-lg transition-all"
                 >
                   Import This Product
                 </button>
