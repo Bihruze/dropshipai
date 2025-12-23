@@ -5,7 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import claudeService from '../services/claudeService';
+import claudeService from '../services/claudeService.js';
 
 const router = Router();
 
