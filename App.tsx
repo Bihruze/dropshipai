@@ -53,7 +53,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#030712] text-gray-100 overflow-hidden">
+    <div className="flex min-h-screen bg-gray-50 text-gray-900 overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Header />

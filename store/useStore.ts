@@ -23,64 +23,9 @@ const DEFAULT_SETTINGS: Settings = {
   timezone: 'UTC',
 };
 
-const INITIAL_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    title: 'Portable Electric Fruit Juicer',
-    description: 'Compact wireless juicer for on-the-go health enthusiasts.',
-    price: 29.99,
-    category: 'Kitchenware',
-    imageUrl: 'https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?w=400&h=400&fit=crop',
-    status: 'active',
-    aiScore: 92,
-    createdAt: new Date().toISOString(),
-    costPrice: 12.00,
-    sku: 'JUICE-001',
-    stock: 45,
-    lowStockThreshold: 10,
-    shopifyProductId: 'mock-shopify-1'
-  },
-  {
-    id: '2',
-    title: 'Smart LED Sunset Lamp',
-    description: 'Relaxing app-controlled sunset lighting.',
-    price: 15.50,
-    category: 'Home Decor',
-    imageUrl: 'https://images.unsplash.com/photo-1550537687-c91072c4792d?w=400&h=400&fit=crop',
-    status: 'active',
-    aiScore: 85,
-    createdAt: new Date().toISOString(),
-    costPrice: 5.50,
-    sku: 'LAMP-002',
-    stock: 3,
-    lowStockThreshold: 5,
-    shopifyProductId: 'mock-shopify-2'
-  }
-];
+const INITIAL_PRODUCTS: Product[] = [];
 
-const INITIAL_ORDERS: Order[] = [
-  {
-    id: "ord-001",
-    shopifyOrderId: "SH-5001",
-    orderNumber: "#1001",
-    customerName: "Alex Morgan",
-    customerEmail: "alex@email.com",
-    shippingAddress: {
-      address1: "123 Commerce St",
-      city: "New York",
-      zip: "10001",
-      country: "USA"
-    },
-    items: [
-      { productId: "1", title: "Juicer Item", quantity: 1, price: 29.99, cost: 12.00, imageUrl: "https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?w=100&h=100&fit=crop" }
-    ],
-    subtotal: 29.99,
-    shippingTotal: 5.99,
-    totalPrice: 35.98,
-    status: "pending",
-    orderDate: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-  }
-];
+const INITIAL_ORDERS: Order[] = [];
 
 export const useStore = create<AppState>((set, get) => {
   // Safe localStorage parsing with error handling
