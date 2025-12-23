@@ -9,7 +9,6 @@ import {
   Zap,
   Play,
   Pause,
-  Settings,
   Activity,
   AlertCircle,
   CheckCircle,
@@ -26,8 +25,6 @@ import {
   AgentState,
   AgentEvent,
   AgentMessage,
-  TrendReport,
-  ProductScoutResult,
   AutoPilotConfig,
 } from '../services/agents/types';
 
@@ -40,9 +37,9 @@ interface AgentCardProps {
 }
 
 const statusColors: Record<string, string> = {
-  idle: 'bg-gray-500',
+  idle: 'bg-gray-400',
   thinking: 'bg-yellow-500 animate-pulse',
-  working: 'bg-blue-500 animate-pulse',
+  working: 'bg-indigo-500 animate-pulse',
   completed: 'bg-green-500',
   error: 'bg-red-500',
   paused: 'bg-orange-500',
@@ -67,20 +64,20 @@ const agentIcons: Record<string, React.ReactNode> = {
 
 const AgentCard: React.FC<AgentCardProps> = ({ agent, onAction }) => {
   const icon = agentIcons[agent.type] || <Bot className="w-6 h-6" />;
-  const statusColor = statusColors[agent.status] || 'bg-gray-500';
+  const statusColor = statusColors[agent.status] || 'bg-gray-400';
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow">
+    <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl text-white">
+          <div className="p-3 bg-indigo-600 rounded-xl text-white">
             {icon}
           </div>
           <div>
-            <h3 className="font-bold text-gray-900 dark:text-white">{agent.name}</h3>
+            <h3 className="font-semibold text-gray-900">{agent.name}</h3>
             <div className="flex items-center gap-2 mt-1">
               <span className={`w-2 h-2 rounded-full ${statusColor}`} />
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-gray-500">
                 {statusLabels[agent.status]}
               </span>
             </div>
@@ -90,15 +87,15 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onAction }) => {
           {agent.status === 'paused' ? (
             <button
               onClick={() => onAction(agent.type, 'resume')}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title="Devam Et"
             >
-              <Play className="w-4 h-4 text-green-500" />
+              <Play className="w-4 h-4 text-green-600" />
             </button>
           ) : agent.status === 'working' || agent.status === 'thinking' ? (
             <button
               onClick={() => onAction(agent.type, 'pause')}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               title="Duraklat"
             >
               <Pause className="w-4 h-4 text-orange-500" />
@@ -111,16 +108,16 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onAction }) => {
       {agent.currentTask && (
         <div className="mb-4">
           <div className="flex justify-between text-sm mb-1">
-            <span className="text-gray-600 dark:text-gray-400 truncate max-w-[200px]">
+            <span className="text-gray-600 truncate max-w-[200px]">
               {agent.currentTask.description}
             </span>
-            <span className="text-indigo-600 dark:text-indigo-400 font-medium">
+            <span className="text-indigo-600 font-medium">
               {agent.currentTask.progress}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+              className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${agent.currentTask.progress}%` }}
             />
           </div>
@@ -129,20 +126,20 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onAction }) => {
 
       {/* Capabilities */}
       <div className="mb-4">
-        <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">
+        <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
           Yetenekler
         </h4>
         <div className="flex flex-wrap gap-1">
           {agent.capabilities.slice(0, 3).map((cap, i) => (
             <span
               key={i}
-              className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full"
+              className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
             >
               {cap}
             </span>
           ))}
           {agent.capabilities.length > 3 && (
-            <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-500 text-xs rounded-full">
+            <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
               +{agent.capabilities.length - 3}
             </span>
           )}
@@ -150,18 +147,18 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onAction }) => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
         <div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="text-2xl font-bold text-gray-900">
             {agent.stats.tasksCompleted}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">Tamamlanan</div>
+          <div className="text-xs text-gray-500">Tamamlanan</div>
         </div>
         <div>
-          <div className="text-2xl font-bold text-green-500">
+          <div className="text-2xl font-bold text-green-600">
             {agent.stats.successRate.toFixed(0)}%
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">Başarı</div>
+          <div className="text-xs text-gray-500">Başarı</div>
         </div>
       </div>
     </div>
@@ -267,16 +264,16 @@ const AgentDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="p-6">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-              <Brain className="w-8 h-8 text-indigo-500" />
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <Brain className="w-7 h-7 text-indigo-600" />
               AI Agent Kontrol Merkezi
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-gray-500 mt-1">
               Tüm AI agent'larınızı tek bir yerden yönetin
             </p>
           </div>
@@ -286,7 +283,7 @@ const AgentDashboard: React.FC = () => {
             <select
               value={selectedNiche}
               onChange={(e) => setSelectedNiche(e.target.value)}
-              className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200"
+              className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="electronics">Elektronik</option>
               <option value="home decor">Ev Dekorasyonu</option>
@@ -300,7 +297,7 @@ const AgentDashboard: React.FC = () => {
               className={`px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition-all ${
                 autoPilotActive
                   ? 'bg-red-500 hover:bg-red-600 text-white'
-                  : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white'
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white'
               }`}
             >
               <Zap className={`w-5 h-5 ${autoPilotActive ? 'animate-pulse' : ''}`} />
@@ -315,51 +312,51 @@ const AgentDashboard: React.FC = () => {
         <button
           onClick={runTrendAnalysis}
           disabled={isLoading}
-          className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all flex items-center gap-4 disabled:opacity-50"
+          className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all flex items-center gap-4 disabled:opacity-50"
         >
-          <div className="p-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl text-white">
+          <div className="p-3 bg-green-500 rounded-xl text-white">
             <TrendingUp className="w-6 h-6" />
           </div>
           <div className="text-left">
-            <h3 className="font-bold text-gray-900 dark:text-white">Trend Analizi</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <h3 className="font-semibold text-gray-900">Trend Analizi</h3>
+            <p className="text-sm text-gray-500">
               {selectedNiche} trendlerini analiz et
             </p>
           </div>
           {activeWorkflow === 'trend-analysis' && (
-            <RefreshCw className="w-5 h-5 text-indigo-500 animate-spin ml-auto" />
+            <RefreshCw className="w-5 h-5 text-indigo-600 animate-spin ml-auto" />
           )}
         </button>
 
         <button
           onClick={runProductDiscovery}
           disabled={isLoading}
-          className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all flex items-center gap-4 disabled:opacity-50"
+          className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all flex items-center gap-4 disabled:opacity-50"
         >
-          <div className="p-3 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl text-white">
+          <div className="p-3 bg-indigo-500 rounded-xl text-white">
             <Search className="w-6 h-6" />
           </div>
           <div className="text-left">
-            <h3 className="font-bold text-gray-900 dark:text-white">Ürün Keşfi</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <h3 className="font-semibold text-gray-900">Ürün Keşfi</h3>
+            <p className="text-sm text-gray-500">
               Tam workflow çalıştır
             </p>
           </div>
           {activeWorkflow === 'product-discovery' && (
-            <RefreshCw className="w-5 h-5 text-indigo-500 animate-spin ml-auto" />
+            <RefreshCw className="w-5 h-5 text-indigo-600 animate-spin ml-auto" />
           )}
         </button>
 
         <button
           onClick={() => setWorkflowResult(null)}
-          className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all flex items-center gap-4"
+          className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all flex items-center gap-4"
         >
-          <div className="p-3 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl text-white">
+          <div className="p-3 bg-purple-500 rounded-xl text-white">
             <Sparkles className="w-6 h-6" />
           </div>
           <div className="text-left">
-            <h3 className="font-bold text-gray-900 dark:text-white">Rakip Analizi</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <h3 className="font-semibold text-gray-900">Rakip Analizi</h3>
+            <p className="text-sm text-gray-500">
               Rakipleri incele
             </p>
           </div>
@@ -376,10 +373,10 @@ const AgentDashboard: React.FC = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Activity Feed */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <Activity className="w-5 h-5 text-indigo-500" />
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-indigo-600" />
               Aktivite Akışı
             </h2>
             <span className="text-sm text-gray-500">{events.length} olay</span>
@@ -389,7 +386,7 @@ const AgentDashboard: React.FC = () => {
             {events.slice().reverse().map((event, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
               >
                 <div
                   className={`p-2 rounded-lg ${
@@ -398,7 +395,7 @@ const AgentDashboard: React.FC = () => {
                       : event.type.includes('failed')
                       ? 'bg-red-100 text-red-600'
                       : event.type.includes('started')
-                      ? 'bg-blue-100 text-blue-600'
+                      ? 'bg-indigo-100 text-indigo-600'
                       : 'bg-gray-100 text-gray-600'
                   }`}
                 >
@@ -414,14 +411,14 @@ const AgentDashboard: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 dark:text-white text-sm">
+                    <span className="font-medium text-gray-900 text-sm">
                       {event.agent || 'System'}
                     </span>
                     <span className="text-xs text-gray-500">
                       {new Date(event.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                  <p className="text-sm text-gray-600 truncate">
                     {typeof event.data === 'object'
                       ? event.data.content || event.data.description || event.type
                       : event.type}
@@ -439,9 +436,9 @@ const AgentDashboard: React.FC = () => {
         </div>
 
         {/* Messages & Results Panel */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-            <MessageSquare className="w-5 h-5 text-indigo-500" />
+        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
+            <MessageSquare className="w-5 h-5 text-indigo-600" />
             Agent Mesajları
           </h2>
 
@@ -451,22 +448,22 @@ const AgentDashboard: React.FC = () => {
                 key={i}
                 className={`p-3 rounded-lg ${
                   msg.type === 'error'
-                    ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                    ? 'bg-red-50 border border-red-200'
                     : msg.type === 'progress'
-                    ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
-                    : 'bg-gray-50 dark:bg-gray-700/50'
+                    ? 'bg-indigo-50 border border-indigo-200'
+                    : 'bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-sm text-indigo-600 dark:text-indigo-400">
+                  <span className="font-medium text-sm text-indigo-600">
                     {msg.from}
                   </span>
                   <ChevronRight className="w-4 h-4 text-gray-400" />
-                  <span className="font-medium text-sm text-gray-600 dark:text-gray-300">
+                  <span className="font-medium text-sm text-gray-600">
                     {msg.to}
                   </span>
                 </div>
-                <p className="text-sm text-gray-700 dark:text-gray-300">{msg.content}</p>
+                <p className="text-sm text-gray-700">{msg.content}</p>
               </div>
             ))}
 
@@ -482,16 +479,16 @@ const AgentDashboard: React.FC = () => {
       {/* Results Modal */}
       {workflowResult && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <BarChart3 className="w-6 h-6 text-indigo-500" />
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <BarChart3 className="w-6 h-6 text-indigo-600" />
                   Workflow Sonuçları
                 </h2>
                 <button
                   onClick={() => setWorkflowResult(null)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  className="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
                 >
                   ✕
                 </button>
@@ -503,17 +500,17 @@ const AgentDashboard: React.FC = () => {
               {workflowResult.trends && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                    <h3 className="font-semibold text-gray-900 mb-3">
                       Trend Analizi: {workflowResult.niche}
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                       {workflowResult.trends.slice(0, 6).map((trend: any, i: number) => (
                         <div
                           key={i}
-                          className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                          className="p-4 bg-gray-50 rounded-lg"
                         >
                           <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-gray-900 dark:text-white">
+                            <span className="font-medium text-gray-900">
                               {trend.keyword}
                             </span>
                             <span
@@ -534,9 +531,9 @@ const AgentDashboard: React.FC = () => {
                             <span>Rekabet: {trend.competition}</span>
                           </div>
                           <div className="mt-2">
-                            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                            <div className="w-full bg-gray-200 rounded-full h-2">
                               <div
-                                className="bg-indigo-500 h-2 rounded-full"
+                                className="bg-indigo-600 h-2 rounded-full"
                                 style={{ width: `${trend.score}%` }}
                               />
                             </div>
@@ -552,16 +549,16 @@ const AgentDashboard: React.FC = () => {
                   {/* Insights */}
                   {workflowResult.insights && (
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                      <h3 className="font-semibold text-gray-900 mb-3">
                         Öngörüler
                       </h3>
                       <ul className="space-y-2">
                         {workflowResult.insights.map((insight: string, i: number) => (
                           <li
                             key={i}
-                            className="flex items-start gap-2 text-gray-600 dark:text-gray-300"
+                            className="flex items-start gap-2 text-gray-600"
                           >
-                            <Target className="w-4 h-4 text-indigo-500 mt-1 flex-shrink-0" />
+                            <Target className="w-4 h-4 text-indigo-600 mt-1 flex-shrink-0" />
                             {insight}
                           </li>
                         ))}
@@ -572,16 +569,16 @@ const AgentDashboard: React.FC = () => {
                   {/* Recommendations */}
                   {workflowResult.recommendations && (
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                      <h3 className="font-semibold text-gray-900 mb-3">
                         Öneriler
                       </h3>
                       <ul className="space-y-2">
                         {workflowResult.recommendations.map((rec: string, i: number) => (
                           <li
                             key={i}
-                            className="flex items-start gap-2 text-gray-600 dark:text-gray-300"
+                            className="flex items-start gap-2 text-gray-600"
                           >
-                            <Sparkles className="w-4 h-4 text-purple-500 mt-1 flex-shrink-0" />
+                            <Sparkles className="w-4 h-4 text-purple-600 mt-1 flex-shrink-0" />
                             {rec}
                           </li>
                         ))}
@@ -594,20 +591,20 @@ const AgentDashboard: React.FC = () => {
               {/* Product Results */}
               {workflowResult.products && (
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                  <h3 className="font-semibold text-gray-900 mb-3">
                     Bulunan Ürünler ({workflowResult.products.length})
                   </h3>
                   <div className="space-y-3">
                     {workflowResult.products.slice(0, 5).map((product: any, i: number) => (
                       <div
                         key={i}
-                        className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex items-center gap-4"
+                        className="p-4 bg-gray-50 rounded-lg flex items-center gap-4"
                       >
-                        <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                        <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                           <Search className="w-6 h-6 text-gray-400" />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-medium text-gray-900 dark:text-white">
+                          <h4 className="font-medium text-gray-900">
                             {product.title}
                           </h4>
                           <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
@@ -636,7 +633,7 @@ const AgentDashboard: React.FC = () => {
 
       {/* AutoPilot Status Bar */}
       {autoPilotActive && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 flex items-center justify-between">
+        <div className="fixed bottom-0 left-0 right-0 bg-indigo-600 text-white py-3 px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Zap className="w-5 h-5 animate-pulse" />
             <span className="font-medium">AutoPilot Aktif</span>
